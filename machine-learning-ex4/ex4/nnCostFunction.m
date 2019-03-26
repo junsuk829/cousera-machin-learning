@@ -61,21 +61,36 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
-fprintf("num %f\n", num_labels);
 y_t = zeros(m, num_labels);
 for i = 1:m
 
 	y_t(i,y(i)) = 1;
 end
 
+% Theta1 : 25 x 401
+% Theta2 : 10 x 26
+X = [ones(m,1) X];	% 5000 x 401
+z2 = X * Theta1';	% 5000 x 25
+a2 = sigmoid(z2);	% 5000 x 25
+a2 = [ones(m,1) a2];	% 5000 by 26
 
-X = [ones(m,1) X];
-a2 = sigmoid(X * Theta1');
-a2 = [ones(m,1) a2];
 
+	J = (-1/m)*sum(sum( (y_t).*log(sigmoid(a2*Theta2')) +(1-y_t).*log(1 - sigmoid(a2*Theta2')),2)) + (1/(2*m))*lambda*(sum(sum(Theta1(1:end, 2:end).^2,2)) + sum(sum(Theta2(1:end, 2:end).^2,2)));
 
-J = (-1/m)*sum(sum( (y_t).*log(sigmoid(a2*Theta2')) +(1-y_t).*log(1 - sigmoid(a2*Theta2')),2)) + (1/(2*m))*lambda*(sum(sum(Theta1(1:end, 2:end).^2,2)) + sum(sum(Theta2(1:end, 2:end).^2,2)));
+	
+	d3 = sigmoid(a2*Theta2')-y_t;	% 5000 x 10
+	d2 = (d3*Theta2(:,2:end)).*sigmoidGradient(z2);	% 5000 x 25
 
+	Delta2 = d3'*a2;	% 10 x 26
+	Delta1 = d2'*X;		% 25 x 401
+
+	Delta2_additional_term = lambda * Theta2;
+	Delta2_additional_term(:,1)=0;
+	Delta1_additional_term = lambda * Theta1;
+	Delta1_additional_term(:,1)=0;
+
+	Theta2_grad = (Delta2 + Delta2_additional_term) / m;
+	Theta1_grad = (Delta1 + Delta1_additional_term) / m;
 
 % -------------------------------------------------------------
 
