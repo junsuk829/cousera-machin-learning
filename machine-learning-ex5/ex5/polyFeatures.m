@@ -15,7 +15,13 @@ X_poly = zeros(numel(X), p);
 %
 % 
 
-
+fprintf("%f\n",numel(X));
+fprintf("%f\n",p);
+for i=1:numel(X)
+	for j=1:p
+		X_poly(i,j)=X(i,1)^j;
+	end
+end
 
 
 
